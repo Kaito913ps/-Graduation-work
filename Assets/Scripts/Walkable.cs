@@ -15,8 +15,8 @@ public class Walkable : MonoBehaviour
     [Header("bool")]
     [SerializeField,Tooltip("階段かどうか")]
     private bool isStair = false;
-    [SerializeField,Tooltip("動くオブジェクトか")]
-    private bool movingGround = false;
+    //動くオブジェクトか
+    public bool movingGround = false;
     [SerializeField, Tooltip("方向変更の有無")]
     private bool dontRotate;
 
