@@ -23,8 +23,9 @@ public class Walkable : MonoBehaviour
     [Space]
 
     [Header("Offsets")]
-    private float walkPointOffset = 5f;
-    private float stairOffset = .4f;
+    public float walkPointOffset =0.5f;
+    public float stairOffset = 0.4f;
+
 
     /// <summary>
     /// 歩く座標を求める
@@ -32,10 +33,9 @@ public class Walkable : MonoBehaviour
     public Vector3 GetWalkPoint()
     {
         //階段かどうか？
-        float stair = (isStair) ? (stairOffset) : 0f;
-
+        float stair = isStair ? stairOffset : 0;
         //座標を返す
-        return transform.position + transform.up * 0.5f - transform.up * stair;
+        return transform.position + transform.up * walkPointOffset - transform.up * stair;
     }
 
     /// <summary>
@@ -44,19 +44,19 @@ public class Walkable : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.gray;
-        float stair = isStair ? .4f : 0;
-        Gizmos.DrawSphere(GetWalkPoint(), .1f);
+        float stair = isStair ? 0.4f : 0;
+        Gizmos.DrawSphere(GetWalkPoint(), 0.1f);
 
-        if (possiblePaths == null)
-            return;
+        //if (possiblePaths == null)
+        //    return;
 
-        foreach (WalkPath p in possiblePaths)
-        {
-            if (p.target == null)
-                return;
-            Gizmos.color = p.active ? Color.black : Color.clear;
-            Gizmos.DrawLine(GetWalkPoint(), p.target.GetComponent<Walkable>().GetWalkPoint());
-        }
+        //foreach (WalkPath p in possiblePaths)
+        //{
+        //    if (p.target == null)
+        //        return;
+        //    Gizmos.color = p.active ? Color.black : Color.clear;
+        //    Gizmos.DrawLine(GetWalkPoint(), p.target.GetComponent<Walkable>().GetWalkPoint());
+        //}
     }
 
     [System.Serializable]
