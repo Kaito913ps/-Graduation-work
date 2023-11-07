@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1102773827778715822}
   - component: {fileID: 1102773827778715823}
   m_Layer: 0
-  m_Name: Stair 2_9_7
+  m_Name: Stair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
