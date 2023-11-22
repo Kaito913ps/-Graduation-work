@@ -93,6 +93,11 @@ public class PlayerController : MonoBehaviour
         BuildPath();
     }
 
+    /// <summary>
+    /// 経路探索のための補助メソッド。
+    /// </summary>
+    /// <param name="nextCubes"></param>
+    /// <param name="visitedCubes"></param>
     private void ExploreCube(List<Transform> nextCubes, List<Transform> visitedCubes)
     {
         Transform current = nextCubes.First();
@@ -132,24 +137,23 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void BuildPath()
     {
-        Debug.Log("Building Path");
+       
         Transform cube = clickedCube;
 
         //リックしたキューブが現在のキューブと同じでない限り」
         while (cube != currentCube)
         {
-            Debug.Log("Inside loop: " + cube.name);
+            
             //実際に移動する経路に挿入
             finalPath.Add(cube);
             //クリックしたキューブの前のキューブがNullの場合」
             if (cube.GetComponent<Walkable>().previousBlock != null)
             {
-                Debug.Log("Inside loop: " + cube.name);
+               
                 cube = cube.GetComponent<Walkable>().previousBlock;
             }
             else
             {
-                Debug.Log("Inside loop: " + cube.name);
                 return;
             }
         }
@@ -190,15 +194,15 @@ public class PlayerController : MonoBehaviour
     public void RayCastDown()
     {
         //プレイヤーの中心座標を生成
-        //Vector3 rayPos = transform.position;
-        //rayPos.y += transform.localScale.y * 0.5f;
+        Vector3 rayPos = transform.position;
+        rayPos.y += transform.localScale.y * 0.5f;
 
         ////レイを作成し、方向は下向き
-        //Ray playerRay = new Ray(rayPos, -transform.up);
-        //RaycastHit playerHit;
-
-        Ray playerRay = new Ray(transform.GetChild(0).position, -transform.up);
+        Ray playerRay = new Ray(rayPos, -transform.up);
         RaycastHit playerHit;
+
+        //Ray playerRay = new Ray(transform.GetChild(0).position, -transform.up);
+        //RaycastHit playerHit;
 
         //レイを発射!!
         if (Physics.Raycast(playerRay, out playerHit))
