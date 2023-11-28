@@ -1,6 +1,7 @@
 using DG.Tweening;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using static Walkable;
 
@@ -18,6 +19,9 @@ public class PlayerController : MonoBehaviour
     [Header("経路")]
     //プレイヤーが実際に移動する経路
     public List<Transform> finalPath = new List<Transform>();
+
+    // PlayerControllerクラス内に追加する部分
+    public HandleController[] handles; // すべてのハンドルへの参照
 
 
 
@@ -65,6 +69,8 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+        // プレイヤーが足場に乗っているかどうかチェック
+        CheckIfOnPlatform();
     }
 
     /// <summary>
@@ -213,5 +219,21 @@ public class PlayerController : MonoBehaviour
                 currentCube = playerHit.transform;
             }
         }
+    }
+
+
+    void CheckIfOnPlatform()
+    {
+        foreach (HandleController handle in handles)
+        {
+            // プレイヤーが足場にいる場合、ハンドルを非アクティブにする
+            handle.SetInteractable(!IsOnPlatform(handle.platformToRotate));
+        }
+    }
+
+    bool IsOnPlatform(Transform platform)
+    {
+        // プレイヤーが特定のプラットフォームに乗っているかどうかを判断
+        return currentCube == platform;
     }
 }
