@@ -6,7 +6,9 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance;
 
+    // BGMを再生するためのオーディオソース
     public AudioSource bgmSource;
+    // 効果音を再生するためのオーディオソース
     public AudioSource sfxSource;
 
     //BGM用のクリップ配列
@@ -19,7 +21,8 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        if(instance == null)
+        // シングルトンパターン
+        if (instance == null)
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
@@ -34,7 +37,8 @@ public class AudioManager : MonoBehaviour
 
     private void InitializeAudioClips()
     {
-        foreach(var clip in bgmClips)
+        // BGMと効果音のクリップを辞書に格納
+        foreach (var clip in bgmClips)
         {
             bgmDict[clip.name] = clip;
         }
@@ -47,7 +51,8 @@ public class AudioManager : MonoBehaviour
 
     public void PlaySFX(string name)
     {
-        if(sfxDict.TryGetValue(name, out var clip))
+        // 指定された名前の効果音を再生
+        if (sfxDict.TryGetValue(name, out var clip))
         {
             sfxSource.PlayOneShot(clip);
         }
@@ -55,7 +60,8 @@ public class AudioManager : MonoBehaviour
 
     public void PlayBGM(string name)
     {
-        if(bgmDict.TryGetValue(name,out var clip))
+        // 指定された名前のBGMを再生
+        if (bgmDict.TryGetValue(name,out var clip))
         {
             bgmSource.clip = clip;
             bgmSource.Play();

@@ -29,7 +29,7 @@ public class Walkable : MonoBehaviour
     [Space]
 
     [Header("Offsets")]
-    [SerializeField,Tooltip("基本のオフセット値")]
+    [SerializeField, Tooltip("基本のオフセット値")]
     private float walkPointOffset = .5f;
     [SerializeField, Tooltip("階段のオフセット")]
     private float stairOffset = .4f;

@@ -1,7 +1,6 @@
-using DG.Tweening;
+ï»¿using DG.Tweening;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 using static Walkable;
 
@@ -9,26 +8,23 @@ public class PlayerController : MonoBehaviour
 {
     public bool walking = false;
     [Space]
-    [Header("ƒLƒ…[ƒu‚Ìî•ñ")]
-    [SerializeField, Tooltip("Œ»İ‚ÌˆÊ’u‚É‚ ‚éƒLƒ…[ƒu")]
+    [Header("ã‚­ãƒ¥ãƒ¼ãƒ–ã®æƒ…å ±")]
+    [SerializeField, Tooltip("ç¾åœ¨ã®ä½ç½®ã«ã‚ã‚‹ã‚­ãƒ¥ãƒ¼ãƒ–")]
     private Transform currentCube;
-    [SerializeField, Tooltip("ƒ}ƒEƒXƒNƒŠƒbƒN‚µ‚½ƒLƒ…[ƒu")]
+    [SerializeField, Tooltip("ãƒã‚¦ã‚¹ã‚¯ãƒªãƒƒã‚¯ã—ãŸã‚­ãƒ¥ãƒ¼ãƒ–")]
     private Transform clickedCube;
 
     [Space]
-    [Header("Œo˜H")]
-    //ƒvƒŒƒCƒ„[‚ªÀÛ‚ÉˆÚ“®‚·‚éŒo˜H
+    [Header("çµŒè·¯")]
+    //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒå®Ÿéš›ã«ç§»å‹•ã™ã‚‹çµŒè·¯
     public List<Transform> finalPath = new List<Transform>();
-
-    // PlayerControllerƒNƒ‰ƒX“à‚É’Ç‰Á‚·‚é•”•ª
-    public HandleController[] handles; // ‚·‚×‚Ä‚Ìƒnƒ“ƒhƒ‹‚Ö‚ÌQÆ
-
-
+    [SerializeField]
+    private float moveSpeed;
 
     // Start is called before the first frame update
     void Start()
     {
-        //ƒvƒŒƒCƒ„[‚ª“¥‚ñ‚Å‚¢‚éƒLƒ…[ƒu‚Ìİ’è
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒè¸ã‚“ã§ã„ã‚‹ã‚­ãƒ¥ãƒ¼ãƒ–ã®è¨­å®š
         RayCastDown();
     }
 
@@ -36,14 +32,14 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        //ƒvƒŒƒCƒ„[‚ª“¥‚ñ‚Å‚¢‚éƒLƒ…[ƒu‚Ìİ’è
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒè¸ã‚“ã§ã„ã‚‹ã‚­ãƒ¥ãƒ¼ãƒ–ã®è¨­å®š
         RayCastDown();
 
-        ////Œ»İ“¥‚ñ‚Å‚¢‚éƒLƒ…[ƒu‚ª“®‚­ê‡
+        ////ç¾åœ¨è¸ã‚“ã§ã„ã‚‹ã‚­ãƒ¥ãƒ¼ãƒ–ãŒå‹•ãå ´åˆ
         if (currentCube.GetComponent<Walkable>().movingGround)
         {
 
-            //ƒvƒŒƒCƒ„[‚ğ‚»‚Ìq‚É“ü‚ê‚é
+            //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ãã®å­ã«å…¥ã‚Œã‚‹
             transform.parent = currentCube.parent;
         }
         else
@@ -51,39 +47,38 @@ public class PlayerController : MonoBehaviour
             transform.parent = null;
         }
 
-        //ƒ}ƒEƒXƒNƒŠƒbƒNƒ`ƒFƒbƒN
-        if (Input.GetMouseButtonDown(0))
+        //ãƒã‚¦ã‚¹ã‚¯ãƒªãƒƒã‚¯ãƒã‚§ãƒƒã‚¯
+        if (Input.GetMouseButtonDown(0) && !walking)
         {
-            Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit mouseHit;
+            HandleMouseClick();
+        }
+    }
 
-            //ƒŒƒCƒC‚ğ”­Ë!!
-            if (Physics.Raycast(mouseRay, out mouseHit))
+    private void HandleMouseClick()
+    {
+        Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(mouseRay, out RaycastHit mouseHit))
+        {
+            if (mouseHit.transform.GetComponent<Walkable>() != null)
             {
-                //ƒNƒŠƒbƒN‚µ‚½êŠ‚ªPath‚Ìê‡
-                if (mouseHit.transform.GetComponent<Walkable>() != null)
-                {
-                    //ƒNƒŠƒbƒN‚µ‚½ƒLƒ…[ƒu‚ÌˆÊ’u‚ğİ’è
-                    clickedCube = mouseHit.transform;
-                    FindPath();
-                }
+                clickedCube = mouseHit.transform;
+                FindPath();
             }
         }
-        // ƒvƒŒƒCƒ„[‚ª‘«ê‚Éæ‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©ƒ`ƒFƒbƒN
-        CheckIfOnPlatform();
     }
 
     /// <summary>
-    ///Œo˜H’Tõ
+    ///çµŒè·¯æ¢ç´¢
     /// </summary>
     private void FindPath()
     {
-        //Ÿ‚ÉˆÚ“®‚·‚éƒLƒ…[ƒu
+        finalPath.Clear();
+        //æ¬¡ã«ç§»å‹•ã™ã‚‹ã‚­ãƒ¥ãƒ¼ãƒ–
         List<Transform> nextCubes = new List<Transform>();
-        //‘O‚ÌƒLƒ…[ƒu
+        //å‰ã®ã‚­ãƒ¥ãƒ¼ãƒ–
         List<Transform> pastCubes = new List<Transform>();
 
-        //Œ»İ‚ÌƒLƒ…[ƒu‚ÉÚ‘±‚³‚ê‚½ƒLƒ…[ƒu‚Ì”‚¾‚¯ƒ‹[ƒv
+        //ç¾åœ¨ã®ã‚­ãƒ¥ãƒ¼ãƒ–ã«æ¥ç¶šã•ã‚ŒãŸã‚­ãƒ¥ãƒ¼ãƒ–ã®æ•°ã ã‘ãƒ«ãƒ¼ãƒ—
         foreach (WalkPath path in currentCube.GetComponent<Walkable>().possiblePaths)
         {
             if (path.active)
@@ -94,95 +89,153 @@ public class PlayerController : MonoBehaviour
         }
 
         pastCubes.Add(currentCube);
-
+        // å†å¸°çš„ã«çµŒè·¯ã‚’æ¢ç´¢
         ExploreCube(nextCubes, pastCubes);
-        BuildPath();
+
+        //æ¢ç´¢ãŒå®Œäº†ã—ãŸå¾Œ,çµŒè·¯ãŒæœ‰åŠ¹ã‹ã©ã†ã‹ã‚’ç¢ºèª
+        if(IsPathValid(clickedCube))
+        {
+            //æœ‰åŠ¹ãªçµŒè·¯ãŒã‚ã‚‹å ´åˆ,
+            BuildPath();
+            Debug.Log("FindPath: æœ‰åŠ¹ãªçµŒè·¯ãŒè¦‹ã¤ã‹ã‚Šã¾ã—ãŸ");
+        }
+        else
+        {
+            // æœ‰åŠ¹ãªçµŒè·¯ãŒãªã„å ´åˆã¯ã‚¯ãƒªã‚¢
+            finalPath.Clear();
+            Debug.Log("FindPath: æœ‰åŠ¹ãªçµŒè·¯ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸ");
+        }
+
     }
 
+
+    private bool IsPathValid(Transform destination)
+    {
+        // ç›®çš„åœ°ã¸ã®çµŒè·¯ãŒå­˜åœ¨ã™ã‚‹ã‹ã©ã†ã‹ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹ãƒ­ã‚¸ãƒƒã‚¯
+        // ã“ã“ã§ã¯ã€å˜ç´”ãªä¾‹ã¨ã—ã¦ã€ç›®çš„åœ°ãŒç›´æ¥çš„ã«ã‚¢ã‚¯ã‚»ã‚¹å¯èƒ½ã‹ã©ã†ã‹ã‚’ãƒã‚§ãƒƒã‚¯ã—ã¾ã™ã€‚
+        foreach (WalkPath path in currentCube.GetComponent<Walkable>().possiblePaths)
+        {
+            if (path.active && path.target == destination)
+            {
+                Debug.Log("ç›´æ¥ã®çµŒè·¯ãŒå­˜åœ¨: " + destination.name);
+                return true; // ç›®çš„åœ°ã¸ç›´æ¥ç§»å‹•ã§ãã‚‹çµŒè·¯ãŒã‚ã‚‹
+            }
+        }
+        // é–“æ¥çš„ãªçµŒè·¯ã®å­˜åœ¨ã‚’ãƒ­ã‚°ã«å‡ºåŠ›
+        bool pathExists = destination.GetComponent<Walkable>().previousBlock != null;
+        Debug.Log("ç›®çš„åœ°ã¸ã®çµŒè·¯ãŒ " + (pathExists ? "å­˜åœ¨ã—ã¾ã™: " : "å­˜åœ¨ã—ã¾ã›ã‚“: ") + destination.name);
+        return pathExists;
+    }
+
+
+
     /// <summary>
-    /// Œo˜H’Tõ‚Ì‚½‚ß‚Ì•â•ƒƒ\ƒbƒhB
+    /// çµŒè·¯æ¢ç´¢ã®ãŸã‚ã®è£œåŠ©ãƒ¡ã‚½ãƒƒãƒ‰ã€‚
     /// </summary>
     /// <param name="nextCubes"></param>
     /// <param name="visitedCubes"></param>
     private void ExploreCube(List<Transform> nextCubes, List<Transform> visitedCubes)
     {
-        Transform current = nextCubes.First();
-        nextCubes.Remove(current);
-
-        //ƒNƒŠƒbƒN‚µ‚½ƒLƒ…[ƒu‚ÆŒ»İ‚ÌƒLƒ…[ƒu‚ª“¯‚¶ê‡
-        //–Ú•WÀ•W‚É“’B‚µ‚½ê‡
-        if (current == clickedCube)
+        while (nextCubes.Count > 0)
         {
-            return;
-        }
+            Transform current = nextCubes[0];
+            nextCubes.RemoveAt(0);
 
-        //Œ»İ‚ÌƒLƒ…[ƒu‚ÌˆÚ“®‰Â”\‚ÈƒLƒ…[ƒu‚Ì”‚¾‚¯ŒJ‚è•Ô‚·
-        foreach (WalkPath path in current.GetComponent<Walkable>().possiblePaths)
-        {
-            //Šù‚É’Ê‰ß‚µ‚½“¹‚Å‚È‚­A‚©‚Â“¹‚ªÚ‘±‚³‚ê‚Ä‚¢‚éê‡
-            if (!visitedCubes.Contains(path.target) && path.active)
+            // ã™ã§ã«è¨ªã‚ŒãŸã‚­ãƒ¥ãƒ¼ãƒ–ã¯ã‚¹ã‚­ãƒƒãƒ—
+            if (visitedCubes.Contains(current))
             {
-                //Ÿ‚ÌŒŸõƒLƒ…[ƒu‚ÉˆÚ“®Œo˜H‚É’Ç‰Áv
-                nextCubes.Add(path.target);
-                //Ÿ‚É’Tõ‚·‚éƒLƒ…[ƒu‚ğˆÚ“®Œo˜H‚É’Ç‰Á
-                path.target.GetComponent<Walkable>().previousBlock = current;
+                continue;
             }
-        }
-        //–K‚ê‚½ƒLƒ…[ƒu‚ÌƒŠƒXƒg‚ÉŒ»İ‚ÌƒLƒ…[ƒu‚ğ’Ç‰Á
-        visitedCubes.Add(current);
 
-        //ƒŠƒXƒg‚ª1‚Â‚Å‚à‚ ‚éê‡
-        if (nextCubes.Any())
-        {
-            ExploreCube(nextCubes, visitedCubes);
-        }
-    }
-
-    /// <summary>
-    /// Œo˜H‚Ì¶¬
-    /// </summary>
-    private void BuildPath()
-    {
-       
-        Transform cube = clickedCube;
-
-        //ƒŠƒbƒN‚µ‚½ƒLƒ…[ƒu‚ªŒ»İ‚ÌƒLƒ…[ƒu‚Æ“¯‚¶‚Å‚È‚¢ŒÀ‚èv
-        while (cube != currentCube)
-        {
-            
-            //ÀÛ‚ÉˆÚ“®‚·‚éŒo˜H‚É‘}“ü
-            finalPath.Add(cube);
-            //ƒNƒŠƒbƒN‚µ‚½ƒLƒ…[ƒu‚Ì‘O‚ÌƒLƒ…[ƒu‚ªNull‚Ìê‡v
-            if (cube.GetComponent<Walkable>().previousBlock != null)
-            {
-               
-                cube = cube.GetComponent<Walkable>().previousBlock;
-            }
-            else
+            // ç¾åœ¨ã®ã‚­ãƒ¥ãƒ¼ãƒ–ãŒã‚¯ãƒªãƒƒã‚¯ã—ãŸã‚­ãƒ¥ãƒ¼ãƒ–ã¨åŒã˜ãªã‚‰ã€æ¢ç´¢çµ‚äº†
+            if (current == clickedCube)
             {
                 return;
             }
+
+            foreach (WalkPath path in current.GetComponent<Walkable>().possiblePaths)
+            {
+                if (path.active && !visitedCubes.Contains(path.target))
+                {
+                    nextCubes.Add(path.target);
+                    path.target.GetComponent<Walkable>().previousBlock = current;
+                }
+            }
+            visitedCubes.Add(current);
         }
+    }
+
+
+
+    /// <summary>
+    /// çµŒè·¯ã®ç”Ÿæˆ
+    /// </summary>
+    private void BuildPath()
+    {
+        Transform cube = clickedCube;
+
+        while (cube != null && cube != currentCube)
+        {
+            // çµŒè·¯ãƒªã‚¹ãƒˆã®å…ˆé ­ã«è¿½åŠ 
+            finalPath.Insert(0, cube);
+
+            cube = cube.GetComponent<Walkable>().previousBlock;
+        }
+
+        // çµŒè·¯ã‚’é€†é †ã«ã—ã¦æ­£ã—ã„é †åºã«
+        finalPath.Reverse();
 
         FollowPath();
     }
 
+
+
     private void FollowPath()
     {
-
-        Sequence s = DOTween.Sequence();
+        if (finalPath.Count == 0 || walking)
+        {
+            return;
+        }
 
         walking = true;
+        Sequence sequence = DOTween.Sequence();
 
-        for (int i = finalPath.Count - 1; i > 0; i--)
+        foreach (Transform waypoint in finalPath)
         {
-            float time = finalPath[i].GetComponent<Walkable>().isStair ? 1.5f : 1;
-
-            s.Append(transform.DOMove(finalPath[i].GetComponent<Walkable>().GetWalkPoint(), .2f * time).SetEase(Ease.Linear));
+            sequence.Append(transform.DOMove(waypoint.position, moveSpeed).SetEase(Ease.Linear))
+                    .AppendCallback(() => Debug.Log("åˆ°é”: " + waypoint.name)); // å„ç§»å‹•å¾Œã«ãƒ­ã‚°å‡ºåŠ›
         }
-        s.Append(transform.DOMove(clickedCube.GetComponent<Walkable>().GetWalkPoint(), .2f).SetEase(Ease.Linear));
-        s.AppendCallback(() => Clear());
+
+        sequence.AppendCallback(() =>
+        {
+            walking = false;
+            OnReachedDestination();
+        });
     }
+
+    private void ClearPath()
+    {
+        foreach (Transform t in finalPath)
+        {
+            t.GetComponent<Walkable>().previousBlock = null;
+        }
+        finalPath.Clear();
+    }
+
+
+    // ç§»å‹•çµ‚äº†æ™‚ã®å‡¦ç†
+    private void OnReachedDestination()
+    {
+        Debug.Log("ç›®çš„åœ°ã«åˆ°é”ã—ã¾ã—ãŸã€‚æœ€çµ‚çš„ãªã‚­ãƒ¥ãƒ¼ãƒ–: " + currentCube.name);
+
+        // ãã®ä»–ã®å¿…è¦ãªå‡¦ç†...
+    }
+
+
+
+    // ç§»å‹•çµ‚äº†æ™‚ã®å‡¦ç†
+
+
 
     void Clear()
     {
@@ -195,45 +248,30 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    ///ƒvƒŒƒCƒ„[‚ªŒ»İ“¥‚ñ‚Å‚¢‚éƒLƒ…[ƒu‚ğŒ©‚Â‚¯‚éŠÖ”
+    ///ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒç¾åœ¨è¸ã‚“ã§ã„ã‚‹ã‚­ãƒ¥ãƒ¼ãƒ–ã‚’è¦‹ã¤ã‘ã‚‹é–¢æ•°
     /// </summary>
     public void RayCastDown()
     {
-        //ƒvƒŒƒCƒ„[‚Ì’†SÀ•W‚ğ¶¬
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä¸­å¿ƒåº§æ¨™ã‚’ç”Ÿæˆ
         Vector3 rayPos = transform.position;
         rayPos.y += transform.localScale.y * 0.5f;
 
-        ////ƒŒƒC‚ğì¬‚µA•ûŒü‚Í‰ºŒü‚«
+        ////ãƒ¬ã‚¤ã‚’ä½œæˆã—ã€æ–¹å‘ã¯ä¸‹å‘ã
         Ray playerRay = new Ray(rayPos, -transform.up);
         RaycastHit playerHit;
 
         //Ray playerRay = new Ray(transform.GetChild(0).position, -transform.up);
         //RaycastHit playerHit;
 
-        //ƒŒƒC‚ğ”­Ë!!
+        //ãƒ¬ã‚¤ã‚’ç™ºå°„!!
         if (Physics.Raycast(playerRay, out playerHit))
         {
             if (playerHit.transform.GetComponent<Walkable>() != null)
             {
-                //‘«ê‚ğ“¥‚ñ‚Å‚¢‚éê‡
+                //è¶³å ´ã‚’è¸ã‚“ã§ã„ã‚‹å ´åˆ
                 currentCube = playerHit.transform;
+               // Debug.Log("RayCastDown: ç¾åœ¨ã®ã‚­ãƒ¥ãƒ¼ãƒ– " + currentCube.name);
             }
         }
-    }
-
-
-    void CheckIfOnPlatform()
-    {
-        foreach (HandleController handle in handles)
-        {
-            // ƒvƒŒƒCƒ„[‚ª‘«ê‚É‚¢‚éê‡Aƒnƒ“ƒhƒ‹‚ğ”ñƒAƒNƒeƒBƒu‚É‚·‚é
-            handle.SetInteractable(!IsOnPlatform(handle.platformToRotate));
-        }
-    }
-
-    bool IsOnPlatform(Transform platform)
-    {
-        // ƒvƒŒƒCƒ„[‚ª“Á’è‚Ìƒvƒ‰ƒbƒgƒtƒH[ƒ€‚Éæ‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©‚ğ”»’f
-        return currentCube == platform;
     }
 }
